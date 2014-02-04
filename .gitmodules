@@ -1,0 +1,6 @@
+[submodule "RaptureXML"]
+	path = RaptureXML
+	url = git@github.com:ZaBlanc/RaptureXML.git
+[submodule "AFNetworking"]
+	path = AFNetworking
+	url = git@github.com:AFNetworking/AFNetworking.git
