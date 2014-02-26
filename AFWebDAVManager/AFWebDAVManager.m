@@ -22,7 +22,7 @@
 
 #import "AFWebDAVManager.h"
 
-#import "RXMLElement.h"
+#import "ONOXMLDocument.h"
 
 static NSString * const AFWebDAVXMLDeclarationString = @"<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
@@ -485,20 +485,24 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
 #pragma mark - AFURLResponseSerializer
 
-- (id)responseObjectForResponse:(__unused NSURLResponse *)response
+- (id)responseObjectForResponse:(NSURLResponse *)response
                            data:(NSData *)data
-                          error:(__unused NSError *__autoreleasing *)error
+                          error:(NSError *__autoreleasing *)error
 {
-    RXMLElement *rootElement = [RXMLElement elementFromXMLData:data];
+    if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
+        return nil;
+    }
 
     NSMutableArray *mutableResponses = [NSMutableArray array];
-    [rootElement iterate:@"response" usingBlock:^(RXMLElement *responseElement) {
-        NSString *href = [[responseElement child:@"href" inNamespace:@"DAV:"] text];
-        NSInteger status = [[[responseElement child:@"status" inNamespace:@"DAV:"] text] integerValue];
-        AFWebDAVMultiStatusResponse *memberResponse = [[AFWebDAVMultiStatusResponse alloc] initWithURL:[NSURL URLWithString:href] statusCode:status properties:[responseElement child:@"propstat"]];
+
+    ONOXMLDocument *XMLDocument = [ONOXMLDocument XMLDocumentWithData:data error:error];
+    for (ONOXMLElement *element in [XMLDocument.rootElement childrenWithTag:@"response"]) {
+        NSString *href = [[element firstChildWithTag:@"href" inNamespace:@"DAV:"] stringValue];
+        NSInteger status = [[[element firstChildWithTag:@"status" inNamespace:@"DAV:"] numberValue] integerValue];
+        AFWebDAVMultiStatusResponse *memberResponse = [[AFWebDAVMultiStatusResponse alloc] initWithURL:[NSURL URLWithString:href] statusCode:status properties:[element firstChildWithTag:@"propstat"]];
         [mutableResponses addObject:memberResponse];
-    }];
-    
+    }
+
     return [NSArray arrayWithArray:mutableResponses];
 }
 
