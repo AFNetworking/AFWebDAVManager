@@ -51,8 +51,8 @@ typedef NS_ENUM(NSUInteger, AFWebDAVLockScope) {
 /**
 
  */
-@interface AFWebDAVManager : AFHTTPRequestOperationManager
 
+@interface AFWebDAVManager : AFHTTPRequestOperationManager
 ///
 
 /**
@@ -240,6 +240,11 @@ typedef NS_ENUM(NSUInteger, AFWebDAVLockScope) {
  
  */
 @property (readonly, nonatomic, strong) id properties;
+@property (readonly, nonatomic) bool isCollection;
+@property (readonly, nonatomic) int contentLength;
+@property (readonly, nonatomic, strong) NSString *status;
+@property (readonly, nonatomic, strong) NSString *creationDate;
+@property (readonly, nonatomic, strong) NSString *lastModified;
 
 ///
 
