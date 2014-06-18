@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 #import "AFWebDAVManager.h"
-
 #import "ONOXMLDocument.h"
 
 static NSString * const AFWebDAVXMLDeclarationString = @"<?xml version=\"1.0\" encoding=\"utf-8\"?>";
@@ -64,12 +63,9 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
         return nil;
     }
 
-    self.namespacesKeyedByAbbreviation = @{@"D": @"DAV"};
-
+    self.namespacesKeyedByAbbreviation = @{@"D": @"DAV:"};
     self.requestSerializer = [AFWebDAVRequestSerializer serializer];
-
     self.responseSerializer = [AFCompoundResponseSerializer compoundSerializerWithResponseSerializers:@[[AFWebDAVMultiStatusResponseSerializer serializer], [AFHTTPResponseSerializer serializer]]];
-
     self.operationQueue.maxConcurrentOperationCount = 1;
 
     return self;
@@ -99,7 +95,12 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     __weak __typeof(self) weakself = self;
     [self MKCOL:URLString success:^(__unused AFHTTPRequestOperation *operation, NSURLResponse *response) {
         if (completionHandler) {
-            completionHandler([response URL], nil);
+            if([response.class.description isEqualToString:@"_NSZeroData"]) {
+                completionHandler(nil, nil);
+            }
+            else {
+                completionHandler([response URL], nil);
+            }
         }
     } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         __strong __typeof(weakself) strongSelf = weakself;
@@ -476,10 +477,8 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     if (!self) {
         return nil;
     }
-
     self.acceptableContentTypes = [[NSSet alloc] initWithObjects:@"application/xml", @"text/xml", nil];
     self.acceptableStatusCodes = [NSIndexSet indexSetWithIndex:207];
-
     return self;
 }
 
@@ -492,17 +491,15 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     if (![self validateResponse:(NSHTTPURLResponse *)response data:data error:error]) {
         return nil;
     }
-
     NSMutableArray *mutableResponses = [NSMutableArray array];
 
     ONOXMLDocument *XMLDocument = [ONOXMLDocument XMLDocumentWithData:data error:error];
     for (ONOXMLElement *element in [XMLDocument.rootElement childrenWithTag:@"response"]) {
-        NSString *href = [[element firstChildWithTag:@"href" inNamespace:@"DAV:"] stringValue];
-        NSInteger status = [[[element firstChildWithTag:@"status" inNamespace:@"DAV:"] numberValue] integerValue];
+        NSString *href = [[element firstChildWithTag:@"href" inNamespace:@"D"] stringValue];
+        NSInteger status = [[[element firstChildWithTag:@"status" inNamespace:@"D"] numberValue] integerValue];
         AFWebDAVMultiStatusResponse *memberResponse = [[AFWebDAVMultiStatusResponse alloc] initWithURL:[NSURL URLWithString:href] statusCode:status properties:[element firstChildWithTag:@"propstat"]];
         [mutableResponses addObject:memberResponse];
     }
-
     return [NSArray arrayWithArray:mutableResponses];
 }
 
@@ -512,6 +509,11 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
 @interface AFWebDAVMultiStatusResponse ()
 @property (readwrite, nonatomic, strong) id properties;
+@property (readwrite, nonatomic) bool isCollection;
+@property (readwrite, nonatomic) int contentLength;
+@property (readwrite, nonatomic, strong) NSString *status;
+@property (readwrite, nonatomic, strong) NSString *creationDate;
+@property (readwrite, nonatomic, strong) NSString *lastModified;
 @end
 
 @implementation AFWebDAVMultiStatusResponse
@@ -524,9 +526,21 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     if (!self) {
         return nil;
     }
-
+    
+    // process the response
     self.properties = properties;
-
+    self.status = [[((ONOXMLElement *)self.properties) firstChildWithTag:@"status" inNamespace:@"D"] stringValue];
+    for (ONOXMLElement *propElement in [((ONOXMLElement *)self.properties) childrenWithTag:@"prop"]) {
+        self.isCollection = NO;
+        for (ONOXMLElement *resourcetypeElement in [propElement childrenWithTag:@"resourcetype"]) {
+            if([resourcetypeElement childrenWithTag:@"collection"].count > 0) {
+                self.isCollection = YES;
+            }
+        }
+        self.creationDate = [[propElement firstChildWithTag:@"creationdate" inNamespace:@"D"] stringValue];
+        self.lastModified = [[propElement firstChildWithTag:@"getlastmodified" inNamespace:@"D"] stringValue];
+        self.contentLength = [[[propElement firstChildWithTag:@"getcontentlength" inNamespace:@"D"] stringValue] intValue];
+    }
     return self;
 }
 
