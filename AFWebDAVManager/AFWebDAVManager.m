@@ -72,8 +72,10 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     }
 
     self.namespacesKeyedByAbbreviation = @{@"D": @"DAV:"};
+
     self.requestSerializer = [AFWebDAVRequestSerializer serializer];
     self.responseSerializer = [AFCompoundResponseSerializer compoundSerializerWithResponseSerializers:@[[AFWebDAVMultiStatusResponseSerializer serializer], [AFHTTPResponseSerializer serializer]]];
+
     self.operationQueue.maxConcurrentOperationCount = 1;
 
     return self;
