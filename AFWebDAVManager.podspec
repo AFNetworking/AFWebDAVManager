@@ -11,6 +11,9 @@ Pod::Spec.new do |s|
   s.source_files = 'AFWebDAVManager'
   s.requires_arc = true
 
+  s.ios.deployment_target = '6.0'
+  s.osx.deployment_target = '10.8'
+
   s.dependency 'AFNetworking', '~> 2.4'
   s.dependency 'Ono', '~> 1.1'
 end
