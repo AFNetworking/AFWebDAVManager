@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <Group
+      location = "group:AFWebDAVManager"
+      name = "AFWebDAVManager">
+      <FileRef
+         location = "group:AFWebDAVManager.h">
+      </FileRef>
+      <FileRef
+         location = "group:AFWebDAVManager.m">
+      </FileRef>
+   </Group>
+</Workspace>
