@@ -239,15 +239,21 @@ typedef NS_ENUM(NSUInteger, AFWebDAVLockScope) {
 /**
  
  */
-@property (readonly, nonatomic, strong) id properties;
-
-///
+@property (readonly, nonatomic, assign, getter=isCollection) BOOL collection;
 
 /**
  
  */
-- (instancetype)initWithURL:(NSURL *)URL
-                 statusCode:(NSInteger)statusCode
-                 properties:(id)properties;
+@property (readonly, nonatomic, assign) NSUInteger contentLength;
+
+/**
+ 
+ */
+@property (readonly, nonatomic, copy) NSDate *creationDate;
+
+/**
+ 
+ */
+@property (readonly, nonatomic, copy) NSDate *lastModifiedDate;
 
 @end
