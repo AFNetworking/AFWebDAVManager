@@ -1,6 +1,6 @@
 # AFWebDAVManager
 
-`AFWebDAVManager` is an `AFHTTPRequestOperationManager` subclass for interacting with the [WebDAV](http://en.wikipedia.org/wiki/WebDAV).
+`AFWebDAVManager` is an `AFHTTPRequestOperationManager` subclass for interacting with [WebDAV](http://en.wikipedia.org/wiki/WebDAV) servers.
 
 **Caution:** This code is still in its early stages of development, so exercise caution when incorporating this into production code.
 
