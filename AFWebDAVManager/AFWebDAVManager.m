@@ -532,8 +532,8 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 - (instancetype)initWithResponseElement:(ONOXMLElement *)element {
     NSParameterAssert(element);
 
-    NSString *href = [[element firstChildWithTag:@"href" inNamespace:@"D"] stringValue];
-    NSInteger status = [[[element firstChildWithTag:@"status" inNamespace:@"D"] numberValue] integerValue];
+    NSString *href = [[element firstChildWithTag:@"href"] stringValue];
+    NSInteger status = [[[element firstChildWithTag:@"status"] numberValue] integerValue];
 
     self = [self initWithURL:[NSURL URLWithString:href] statusCode:status HTTPVersion:@"HTTP/1.1" headerFields:nil];
     if (!self) {
@@ -548,9 +548,9 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
         }
     }
 
-    self.contentLength = [[[propElement firstChildWithTag:@"getcontentlength" inNamespace:@"D"] numberValue] unsignedIntegerValue];
-    self.creationDate = [[propElement firstChildWithTag:@"creationdate" inNamespace:@"D"] dateValue];
-    self.lastModifiedDate = [[propElement firstChildWithTag:@"getlastmodified" inNamespace:@"D"] dateValue];
+    self.contentLength = [[[propElement firstChildWithTag:@"getcontentlength"] numberValue] unsignedIntegerValue];
+    self.creationDate = [[propElement firstChildWithTag:@"creationdate"] dateValue];
+    self.lastModifiedDate = [[propElement firstChildWithTag:@"getlastmodified"] dateValue];
 
     return self;
 }
