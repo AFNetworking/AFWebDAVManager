@@ -1,24 +1,3 @@
-modify by OYXJ on 2016.08
-
-AFHTTPRequestOperation —> NSURLSessionDataTask
-
-XML formart via Ono
-
-the commit of code has been verified in a project of my company. SO IT WORKS !
-
-P.S. ---> merge the following
-
-1、Fixed crash related to sending 'URL' selector to '_NSInlineData' inst…
-thanks to @danielr
-danielr@1ba182b
-
-2、WebDav Response Namespace not always 'D'
-thanks to @BitSuites
-BitSuites@c25abdb
-
---------------------------------------------------------------------------------
-
-
 # AFWebDAVManager
 
 `AFWebDAVManager` is an `AFHTTPRequestOperationManager` subclass for interacting with [WebDAV](http://en.wikipedia.org/wiki/WebDAV) servers.
