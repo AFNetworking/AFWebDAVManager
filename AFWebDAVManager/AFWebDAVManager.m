@@ -85,15 +85,15 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
 - (void)contentsOfDirectoryAtURLString:(NSString *)URLString
                              recursive:(BOOL)recursive
-                     completionHandler:(void (^)(NSArray *items, NSError *error))completionHandler
+                     completionHandler:(void (^)(NSArray *items, AFHTTPRequestOperation *operation, NSError *error))completionHandler
 {
     [self PROPFIND:URLString propertyNames:nil depth:(recursive ? AFWebDAVInfinityDepth : AFWebDAVOneDepth) success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         if (completionHandler) {
-            completionHandler(responseObject, nil);
+            completionHandler(responseObject, operation, nil);
         }
     } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         if (completionHandler) {
-            completionHandler(nil, error);
+            completionHandler(nil, operation, error);
         }
     }];
 }
@@ -217,7 +217,7 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 - (void)contentsOfFileAtURLString:(NSString *)URLString
                 completionHandler:(void (^)(NSData *contents, NSError *error))completionHandler
 {
-    [self GET:URLString parameters:nil success:^(AFHTTPRequestOperation *operation, __unused id responseObject) {
+    AFHTTPRequestOperation *operation = [self GET:URLString parameters:nil success:^(AFHTTPRequestOperation *operation, __unused id responseObject) {
         if (completionHandler) {
             completionHandler(operation.responseData, nil);
         }
@@ -225,6 +225,9 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
         if (completionHandler) {
             completionHandler(nil, error);
         }
+    }];
+    [operation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+        NSLog(@"%lu ----- %lld ------ %lld", (unsigned long)bytesRead, totalBytesRead, totalBytesExpectedToRead);
     }];
 }
 

@@ -66,7 +66,7 @@ typedef NS_ENUM(NSUInteger, AFWebDAVLockScope) {
  */
 - (void)contentsOfDirectoryAtURLString:(NSString *)URLString
                              recursive:(BOOL)recursive
-                     completionHandler:(void (^)(NSArray *items, NSError *error))completionHandler;
+                     completionHandler:(void (^)(NSArray *items, AFHTTPRequestOperation *operation, NSError *error))completionHandler;
 
 /**
  Creates a directory at the path represented by the specified URL string.
