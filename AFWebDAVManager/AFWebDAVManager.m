@@ -85,15 +85,15 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
 - (void)contentsOfDirectoryAtURLString:(NSString *)URLString
                              recursive:(BOOL)recursive
-                     completionHandler:(void (^)(NSArray *items, NSError *error))completionHandler
+                     completionHandler:(void (^)(NSArray *items, AFHTTPRequestOperation *operation, NSError *error))completionHandler
 {
     [self PROPFIND:URLString propertyNames:nil depth:(recursive ? AFWebDAVInfinityDepth : AFWebDAVOneDepth) success:^(__unused AFHTTPRequestOperation *operation, id responseObject) {
         if (completionHandler) {
-            completionHandler(responseObject, nil);
+            completionHandler(responseObject, operation, nil);
         }
     } failure:^(__unused AFHTTPRequestOperation *operation, NSError *error) {
         if (completionHandler) {
-            completionHandler(nil, error);
+            completionHandler(nil, operation, error);
         }
     }];
 }
@@ -217,7 +217,7 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 - (void)contentsOfFileAtURLString:(NSString *)URLString
                 completionHandler:(void (^)(NSData *contents, NSError *error))completionHandler
 {
-    [self GET:URLString parameters:nil success:^(AFHTTPRequestOperation *operation, __unused id responseObject) {
+    AFHTTPRequestOperation *operation = [self GET:URLString parameters:nil success:^(AFHTTPRequestOperation *operation, __unused id responseObject) {
         if (completionHandler) {
             completionHandler(operation.responseData, nil);
         }
@@ -225,6 +225,9 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
         if (completionHandler) {
             completionHandler(nil, error);
         }
+    }];
+    [operation setDownloadProgressBlock:^(NSUInteger bytesRead, long long totalBytesRead, long long totalBytesExpectedToRead) {
+        NSLog(@"%lu ----- %lld ------ %lld", (unsigned long)bytesRead, totalBytesRead, totalBytesExpectedToRead);
     }];
 }
 
@@ -290,7 +293,7 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
     NSMutableURLRequest *request = [self.requestSerializer requestWithMethod:@"PROPFIND" URLString:[[self.baseURL URLByAppendingPathComponent:URLString] absoluteString] parameters:nil error:nil];
 	[request setValue:AFWebDAVStringForDepth(depth) forHTTPHeaderField:@"Depth"];
-    [request setValue:@"application/xml" forHTTPHeaderField:@"Content-Type:"];
+    [request setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:[mutableXMLString dataUsingEncoding:NSUTF8StringEncoding]];
 
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
@@ -532,8 +535,8 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 - (instancetype)initWithResponseElement:(ONOXMLElement *)element {
     NSParameterAssert(element);
 
-    NSString *href = [[element firstChildWithTag:@"href" inNamespace:@"D"] stringValue];
-    NSInteger status = [[[element firstChildWithTag:@"status" inNamespace:@"D"] numberValue] integerValue];
+    NSString *href = [[element firstChildWithTag:@"href"] stringValue];
+    NSInteger status = [[[element firstChildWithTag:@"status"] numberValue] integerValue];
 
     self = [self initWithURL:[NSURL URLWithString:href] statusCode:status HTTPVersion:@"HTTP/1.1" headerFields:nil];
     if (!self) {
@@ -548,9 +551,9 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
         }
     }
 
-    self.contentLength = [[[propElement firstChildWithTag:@"getcontentlength" inNamespace:@"D"] numberValue] unsignedIntegerValue];
-    self.creationDate = [[propElement firstChildWithTag:@"creationdate" inNamespace:@"D"] dateValue];
-    self.lastModifiedDate = [[propElement firstChildWithTag:@"getlastmodified" inNamespace:@"D"] dateValue];
+    self.contentLength = [[[propElement firstChildWithTag:@"getcontentlength"] numberValue] unsignedIntegerValue];
+    self.creationDate = [[propElement firstChildWithTag:@"creationdate"] dateValue];
+    self.lastModifiedDate = [[propElement firstChildWithTag:@"getlastmodified"] dateValue];
 
     return self;
 }

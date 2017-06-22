@@ -1,12 +1,12 @@
 Pod::Spec.new do |s|
-  s.name         = "AFWebDAVManager"
+  s.name         = "BPWebDAVManager"
   s.version      = "0.0.1"
   s.summary      = "AFNetworking extension for WebDAV"
   s.homepage     = "https://github.com/AFNetworking/AFWebDAVManager"
   s.social_media_url = "https://twitter.com/AFNetworking"
   s.license      = 'MIT'
   s.author       = { "Mattt Thompson" => "m@mattt.me" }
-  s.source       = { :git => "https://github.com/AFNetworking/AFWebDAVManager.git", :tag => "0.0.1" }
+  s.source       = { :git => "https://github.com/BitSuites/AFWebDAVManager.git", :tag => "0.0.1" }
 
   s.source_files = 'AFWebDAVManager'
   s.requires_arc = true
