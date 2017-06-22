@@ -293,7 +293,7 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
 
     NSMutableURLRequest *request = [self.requestSerializer requestWithMethod:@"PROPFIND" URLString:[[self.baseURL URLByAppendingPathComponent:URLString] absoluteString] parameters:nil error:nil];
 	[request setValue:AFWebDAVStringForDepth(depth) forHTTPHeaderField:@"Depth"];
-    [request setValue:@"application/xml" forHTTPHeaderField:@"Content-Type:"];
+    [request setValue:@"application/xml" forHTTPHeaderField:@"Content-Type"];
     [request setHTTPBody:[mutableXMLString dataUsingEncoding:NSUTF8StringEncoding]];
 
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
