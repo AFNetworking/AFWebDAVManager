@@ -430,8 +430,10 @@ static NSString * AFWebDAVStringForLockType(AFWebDAVLockType type) {
     [request setValue:AFWebDAVStringForDepth(depth) forHTTPHeaderField:@"Depth"];
     if (timeoutInterval > 0) {
         [request setValue:[@(timeoutInterval) stringValue] forHTTPHeaderField:@"Timeout"];
-    }
-
+    }			 
+    [request setValue:@"application/xml" forHTTPHeaderField:@"Content-Type:"];
+    [request setHTTPBody:[mutableXMLString dataUsingEncoding:NSUTF8StringEncoding]];
+				 
     AFHTTPRequestOperation *operation = [self HTTPRequestOperationWithRequest:request success:success failure:failure];
     [self.operationQueue addOperation:operation];
 
